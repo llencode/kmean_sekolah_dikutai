@@ -1,0 +1,112 @@
+# A tibble: 18 x 4
+   Wilayah          Jumlah Negeri Swasta
+   <chr>             <dbl>  <dbl>  <dbl>
+ 1 Sangatta Utara       16      5     11
+ 2 Bengalon              6      4      2
+ 3 Muara Wahau           5      5      0
+ 4 Sangkulirang          5      3      2
+ 5 Kongbeng              5      4      1
+ 6 Sangatta Selatan      5      2      3
+ 7 Muara Ancalong        4      4      0
+ 8 Muara Bengkal         5      5      0
+ 9 Kaliorang             4      4      0
+10 Kaubun                5      5      0
+11 Sandaran              4      4      0
+12 Rantau Pulung         3      2      1
+13 Karangan              4      3      1
+14 Telen                 3      3      0
+15 Teluk Pandan          2      2      0
+16 Long Mesangat         2      2      0
+17 Busang                2      2      0
+18 Batu Ampar            2      2      0
+> data$LuasLahan
+NULL
+Warning message:
+Unknown or uninitialised column: 'LuasLahan'. 
+> data$Wilayah
+ [1] "Sangatta Utara"   "Bengalon"         "Muara Wahau"      "Sangkulirang"    
+ [5] "Kongbeng"         "Sangatta Selatan" "Muara Ancalong"   "Muara Bengkal"   
+ [9] "Kaliorang"        "Kaubun"           "Sandaran"         "Rantau Pulung"   
+[13] "Karangan"         "Telen"            "Teluk Pandan"     "Long Mesangat"   
+[17] "Busang"           "Batu Ampar"      
+> hasil<-kmeans(data[,2,3],3)
+> hasil
+K-means clustering with 3 clusters of sizes 6, 11, 1
+
+Cluster means:
+       [,1]
+1  2.333333
+2  4.727273
+3 16.000000
+
+Clustering vector:
+ [1] 3 2 2 2 2 2 2 2 2 2 2 1 2 1 1 1 1 1
+
+Within cluster sum of squares by cluster:
+[1] 1.333333 4.181818 0.000000
+ (between_SS / total_SS =  96.7 %)
+
+Available components:
+
+[1] "cluster"      "centers"      "totss"        "withinss"     "tot.withinss"
+[6] "betweenss"    "size"         "iter"         "ifault"      
+> hasil$cluster
+ [1] 3 2 2 2 2 2 2 2 2 2 2 1 2 1 1 1 1 1
+> hasil$centers
+       [,1]
+1  2.333333
+2  4.727273
+3 16.000000
+> hasil$size
+[1]  6 11  1
+> table(hasil$cluster, data$Wilayah)
+   
+    Batu Ampar Bengalon Busang Kaliorang Karangan Kaubun Kongbeng Long Mesangat
+  1          1        0      1         0        0      0        0             1
+  2          0        1      0         1        1      1        1             0
+  3          0        0      0         0        0      0        0             0
+   
+    Muara Ancalong Muara Bengkal Muara Wahau Rantau Pulung Sandaran Sangatta Selatan
+  1              0             0           0             1        0                0
+  2              1             1           1             0        1                1
+  3              0             0           0             0        0                0
+   
+    Sangatta Utara Sangkulirang Telen Teluk Pandan
+  1              0            0     1            1
+  2              0            1     0            0
+  3              1            0     0            0
+> hasil$cluster <- as.factor(hasil$cluster)
+> ggplot(data, aes(data$Wilayah, data$Negeri, data$Swasta, color = hasil$cluster)) + geom_point()
+> dataSample <-data[,2,3]
+> hc <- hclust(dist(dataSample), method="ave")
+> hc
+
+Call:
+hclust(d = dist(dataSample), method = "ave")
+
+Cluster method   : average 
+Distance         : euclidean 
+Number of objects: 18 
+
+> plot(hc, hang = -1, labels=data$KotaKab)
+Warning message:
+Unknown or uninitialised column: 'KotaKab'. 
+> plot(hc, hang = -1, labels=data$Negeri)
+> d <- dist(dataSample, method="euclidian")
+> pamCluster <- pam(d, 3)
+> clusplot(as.matrix(d), pamCluster$cluster, color=T, shade=T, labels=3, lines=0)
+> pamCluster
+Medoids:
+     ID   
+[1,]  1  1
+[2,]  3  3
+[3,] 18 18
+Clustering vector:
+ [1] 1 2 2 2 2 2 2 2 2 2 2 3 2 3 3 3 3 3
+Objective function:
+    build      swap 
+0.5555556 0.3888889 
+
+Available components:
+[1] "medoids"    "id.med"     "clustering" "objective"  "isolation"  "clusinfo"  
+[7] "silinfo"    "diss"       "call"   
